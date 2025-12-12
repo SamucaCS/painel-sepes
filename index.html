@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Dirigente</title>
+    <link rel="stylesheet" href="painel.css" />
+</head>
+
+<body>
+    <div class="page">
+        <header class="page-header">
+            <div>
+                <h1>Painel Sepes</h1>
+                <p class="subtitle">Acompanhe SEFREP e SEAPE</p>
+            </div>
+            <div class="header-actions">
+                <span class="pill">Modo: <strong>Dirigente</strong></span>
+            </div>
+        </header>
+
+        <div class="layout" style="grid-template-columns: 1fr;">
+            <section class="card main">
+                <div class="section-title">
+                    <h3>Selecione o painel</h3>
+                </div>
+
+                <div style="display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:12px;">
+                    <a class="card" href="seape.html" style="padding:16px; display:block;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                            <div>
+                                <h2 style="margin:0; font-size:16px;">Painel SEAPE</h2>
+                                <p class="subtitle" style="margin:8px 0 0;">Evolução Funcional, Aposentadoria, FAI &amp;
+                                    PUCT.</p>
+                            </div>
+                            <span class="btn primary" style="white-space:nowrap;">Abrir</span>
+                        </div>
+                    </a>
+
+                    <a class="card" href="sefrep.html" style="padding:16px; display:block;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                            <div>
+                                <h2 style="margin:0; font-size:16px;">Painel SEFREP</h2>
+                                <p class="subtitle" style="margin:8px 0 0;">VTC, CTC, Licença Prêmio, Contagem de Tempo.
+                                </p>
+                            </div>
+                            <span class="btn primary" style="white-space:nowrap;">Abrir</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="msg" style="margin-top:14px;">
+                    ✅ Este painel <strong>não carrega nem exibe</strong> o campo <strong>nome</strong>. Só mostra tema,
+                    escola, status/tópico, protocolo/processo, datas e observações.
+                </div>
+            </section>
+        </div>
+
+        <div class="footer">
+            <span>Painel Sepes • Menu</span>
+            <span>Pronto para evoluir (filtros, exportação, etc.)</span>
+        </div>
+    </div>
+</body>
+
+</html>

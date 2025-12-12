@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Dirigente – SEFREP</title>
+    <link rel="stylesheet" href="painel.css" />
+</head>
+
+<body>
+    <div class="page">
+        <header class="page-header">
+            <div>
+                <h1>Painel – SEFREP</h1>
+            </div>
+
+            <div class="header-actions">
+                <span id="pillResumo" class="pill">Registros: <strong>—</strong></span>
+                <button class="btn ghost" id="btnMenu">Menu</button>
+                <button class="btn" id="btnSeape">SEAPE</button>
+                <button class="btn danger" id="btnRecarregar">Recarregar</button>
+            </div>
+        </header>
+
+        <div class="layout">
+            <aside class="card sidebar">
+                <h2>FILTROS</h2>
+
+                <div class="filters">
+                    <div class="field">
+                        <label for="fTema">Tema</label>
+                        <select id="fTema"></select>
+                    </div>
+
+                    <div class="field">
+                        <label for="fStatus">Status</label>
+                        <select id="fStatus"></select>
+                    </div>
+
+                    <div class="field">
+                        <label for="fEscola">Escola</label>
+                        <select id="fEscola"></select>
+                    </div>
+
+                    <div class="field">
+                        <label for="fBusca">Busca (protocolo/tópico/obs)</label>
+                        <input id="fBusca" type="text" placeholder="Digite para filtrar..." />
+                    </div>
+
+                    <button class="btn primary" id="btnAplicar">Aplicar</button>
+                    <button class="btn" id="btnLimpar">Limpar filtros</button>
+                </div>
+
+                <div class="small-note">
+                    Em <strong>Licença Prêmio</strong> e <strong>Contagem de Tempo</strong>, a coluna “Status” mostra o
+                    <strong>Tópico</strong> (sem cor).
+                </div>
+
+                <div id="msg" class="msg" style="display:none;"></div>
+            </aside>
+
+            <main class="card main">
+                <div class="cards" id="kpis"></div>
+
+                <div class="split">
+                    <div class="chart-box">
+                        <div class="section-title">
+                            <h3>Status</h3>
+                        </div>
+
+                        <canvas id="pieStatus"></canvas>
+
+                        <div class="legend">
+                            <span><i class="dot ok"></i>Concluído</span>
+                            <span><i class="dot warn"></i>Em andamento</span>
+                            <span><i class="dot bad"></i>Não concluído</span>
+                            <span><i class="dot neutral"></i>Sem status (tópico)</span>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <div class="section-title">
+                            <h3>Registros</h3>
+                            <span class="muted" id="lblQtd">—</span>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tema</th>
+                                    <th>Escola</th>
+                                    <th>Status / Tópico</th>
+                                    <th>Protocolo</th>
+                                    <th>Entrada</th>
+                                    <th>Saída</th>
+                                    <th>Observações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <span>SEFREP • Dirigente</span>
+                    <span id="lblAtualizacao">—</span>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="sefrep.js" defer></script>
+</body>
+
+</html>
