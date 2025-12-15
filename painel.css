@@ -10,7 +10,7 @@
     --warn: #F59E0B;
     --bad: #EF4444;
     --neutral: #94A3B8;
-   
+
 }
 
 * {
@@ -39,7 +39,7 @@ a {
 }
 
 .page {
-    max-width: 1180px;
+    max-width: 1600px;
     margin: 28px auto;
     padding: 0 18px;
 }
@@ -425,4 +425,238 @@ tbody tr:hover td {
     table {
         min-width: 760px
     }
+}
+
+.layout {
+    grid-template-columns: 320px 1fr;
+}
+
+.chart-box--sidebar {
+    margin-top: 12px;
+}
+
+.chart-box--sidebar canvas {
+    width: 100% !important;
+    height: 170px !important;
+}
+
+.split {
+    grid-template-columns: 1fr;
+}
+
+table {
+    min-width: 980px;
+}
+
+.table-wrap {
+    overflow-x: hidden;
+}
+
+table {
+    width: 100%;
+    min-width: 0 !important;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+thead th,
+tbody td {
+    padding: 8px 8px;
+    font-size: 12px;
+    line-height: 1.15;
+}
+
+tbody td {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+thead th {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.badge-status,
+.tag-neutral {
+    font-size: 11px;
+    padding: 2px 8px;
+}
+
+table {
+    table-layout: fixed;
+}
+
+thead th:nth-child(1),
+tbody td:nth-child(1) {
+    width: 92px;
+}
+
+thead th:nth-child(2),
+tbody td:nth-child(2) {
+    width: 120px;
+}
+
+thead th:nth-child(3),
+tbody td:nth-child(3) {
+    width: 140px;
+}
+
+thead th:nth-child(4),
+tbody td:nth-child(4) {
+    width: 150px;
+}
+
+thead th:nth-child(5),
+tbody td:nth-child(5) {
+    width: 140px;
+}
+
+thead th:nth-child(6),
+tbody td:nth-child(6) {
+    width: 90px;
+}
+
+thead th:nth-child(7),
+tbody td:nth-child(7) {
+    width: 90px;
+}
+
+
+tbody td:nth-child(4) {
+    overflow: hidden;
+}
+
+.badge-status {
+    max-width: 100%;
+    display: inline-flex;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+tbody td:nth-child(5) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+tbody td {
+    padding: 6px 8px !important;
+    font-size: 12px;
+    line-height: 1.05;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+thead th {
+    padding: 8px 8px !important;
+    font-size: 12px;
+    white-space: nowrap;
+}
+.badge-status {
+    padding: 2px 8px !important;
+    line-height: 1 !important;
+}
+tbody td:nth-child(8) {
+    white-space: nowrap;
+}
+
+.table-wrap {
+    overflow-x: hidden;
+}
+
+table {
+    width: 100%;
+    min-width: 0 !important;
+    table-layout: fixed;
+}
+
+thead th,
+tbody td {
+    padding: 6px 6px !important;
+    font-size: 11px !important;
+    line-height: 1.05;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+.badge-status {
+    font-size: 10.5px !important;
+    padding: 2px 7px !important;
+    line-height: 1 !important;
+    max-width: 100%;
+}
+
+thead th:nth-child(1),
+tbody td:nth-child(1) {
+    width: 10%;
+}
+
+thead th:nth-child(2),
+tbody td:nth-child(2) {
+    width: 12%;
+}
+
+thead th:nth-child(3),
+tbody td:nth-child(3) {
+    width: 10%;
+}
+
+thead th:nth-child(4),
+tbody td:nth-child(4) {
+    width: 16%;
+}
+
+thead th:nth-child(5),
+tbody td:nth-child(5) {
+    width: 14%;
+}
+thead th:nth-child(6),
+tbody td:nth-child(6) {
+    width: 9%;
+}
+
+thead th:nth-child(7),
+tbody td:nth-child(7) {
+    width: 9%;
+}
+
+thead th:nth-child(8),
+tbody td:nth-child(8) {
+    width: 20%;
+}
+
+tbody td:nth-child(4) {
+    overflow: hidden;
+}
+
+.table-wrap {
+    overflow: auto !important;
+}
+
+table {
+    width: max-content !important;
+    min-width: 1400px !important;
+    table-layout: auto !important;
+}
+thead th,
+tbody td {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+    line-height: 1.15;
+    vertical-align: middle;
+}
+
+.badge-status {
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
 }
