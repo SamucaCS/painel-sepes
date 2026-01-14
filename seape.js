@@ -199,13 +199,11 @@ function renderPie(rows) {
         }
     });
 }
-
 function renderTable(rows) {
     const tbody = $("tbody");
     tbody.innerHTML = "";
-
     if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="muted">Nenhum registro encontrado.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="muted">Nenhum registro encontrado.</td></tr>`;
         return;
     }
 
@@ -217,19 +215,20 @@ function renderTable(rows) {
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-      <td>${fmtDateTime(r.created_at || r.updated_at)}</td>
-      <td>${escapeHtml(temaLabel)}</td>
-      <td>${r.escola ? escapeHtml(r.escola) : `<span class="muted">—</span>`}</td>
-      <td>${st}</td>
-      <td>${proc ? escapeHtml(proc) : `<span class="muted">—</span>`}</td>
-      <td>${r.data_entrada ? fmtDate(r.data_entrada) : `<span class="muted">—</span>`}</td>
-      <td>${r.data_saida ? fmtDate(r.data_saida) : `<span class="muted">—</span>`}</td>
-      <td title="${escapeAttr(obs)}">${obs ? escapeHtml(truncate(obs, 70)) : `<span class="muted">—</span>`}</td>
-    `;
+            <td>${escapeHtml(temaLabel)}</td>
+            <td>${st}</td>
+            <td>${proc ? escapeHtml(proc) : `<span class="muted">—</span>`}</td>
+            <td>${r.data_entrada ? fmtDate(r.data_entrada) : `<span class="muted">—</span>`}</td>
+            <td>${r.data_saida ? fmtDate(r.data_saida) : `<span class="muted">—</span>`}</td>
+            <td class="col-obs">
+                <div class="obs-wrapper" title="${escapeAttr(obs)}">
+                    ${obs ? escapeHtml(obs) : `<span class="muted">—</span>`}
+                </div>
+            </td>
+        `;
         tbody.appendChild(tr);
     });
 }
-
 function prettyTema(key) {
     const t = TEMAS.find(x => x.key === key);
     return t ? t.label : key;
