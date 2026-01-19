@@ -2,17 +2,22 @@ const SUPABASE_URL = "https://ffprsdeicjjttfedzbif.supabase.co";
 const SUPABASE_ANON_KEY =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmcHJzZGVpY2pqdHRmZWR6YmlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NTg4NTksImV4cCI6MjA4MTEzNDg1OX0.U5J1L6vv7RZztxUjJ4UKcNhtHzwOlaU0NTeXoyAa0GU";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const TEMAS = [
     { key: "VTC", label: "VTC" },
     { key: "CTC", label: "CTC" },
     { key: "LICENCA_PREMIUM", label: "Licença Prêmio" },
-    { key: "LICENCA_PREMIO", label: "Licença Prêmio" }, 
+    { key: "LICENCA_PREMIO", label: "Licença Prêmio" },
     { key: "CONTAGEM_TEMPO", label: "Contagem de Tempo" },
 ];
-const TEMAS_TOPICO = new Set(["LICENCA_PREMIUM", "LICENCA_PREMIO", "CONTAGEM_TEMPO"]);
+
+// Removido CONTAGEM_TEMPO daqui para que ele mostre o Status/Badge
+const TEMAS_TOPICO = new Set(["LICENCA_PREMIUM", "LICENCA_PREMIO"]);
+
 const $ = (id) => document.getElementById(id);
 let allRows = [];
 let pieChart = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     $("btnMenu").addEventListener("click", () => (window.location.href = "index.html"));
     $("btnSeape").addEventListener("click", () => (window.location.href = "seape.html"));
@@ -43,7 +48,6 @@ function showMsg(text, type = "") {
 }
 
 function fillFiltersDefaults() {
-    // Tema
     const temaSel = $("fTema");
     temaSel.innerHTML = `<option value="">Todos</option>` +
         [
@@ -56,9 +60,12 @@ function fillFiltersDefaults() {
     const statusSel = $("fStatus");
     statusSel.innerHTML = `
     <option value="">Todos</option>
-    <option value="concluido">Concluído</option>
+    <option value="concluido">Concluído / Finalizado</option>
     <option value="andamento">Em andamento</option>
     <option value="naoconcluido">Não concluído</option>
+    <option value="analise">Em análise</option>
+    <option value="devolvido">Devolvido</option>
+    <option value="publicado">Publicado</option>
     <option value="semstatus">Sem status (tópico)</option>
   `;
     $("fEscola").innerHTML = `<option value="">Todas</option>`;
@@ -93,17 +100,15 @@ async function fetchAllSEFREP() {
     while (true) {
         const { data, error } = await supabaseClient
             .from("sefrep_registros")
-            .select("id, tema_key, tema, escola, protocolo, status, topico, observacoes, data_entrada, data_saida, created_at, updated_at")
+            .select("*")
             .order("created_at", { ascending: false })
             .range(from, from + pageSize - 1);
 
         if (error) throw error;
-
         out = out.concat(data || []);
         if (!data || data.length < pageSize) break;
         from += pageSize;
     }
-
     return out;
 }
 
@@ -116,7 +121,6 @@ function applyFilters() {
     let rows = [...allRows];
 
     if (tema) rows = rows.filter(r => (r.tema_key || "") === tema);
-
     if (escola) rows = rows.filter(r => (r.escola || "") === escola);
 
     if (status) {
@@ -125,18 +129,13 @@ function applyFilters() {
             const semStatus = TEMAS_TOPICO.has(temaKey);
             if (status === "semstatus") return semStatus;
             if (semStatus) return false;
-             return statusClass(r.status || "") === status;
+            return statusClass(r.status || "") === status;
         });
     }
 
     if (busca) {
         rows = rows.filter(r => {
-            const bag = [
-                r.protocolo,
-                r.topico,
-                r.observacoes,
-                r.escola
-            ].filter(Boolean).join(" ").toLowerCase();
+            const bag = [r.nome, r.protocolo, r.topico, r.observacoes, r.escola].filter(Boolean).join(" ").toLowerCase();
             return bag.includes(busca);
         });
     }
@@ -144,29 +143,19 @@ function applyFilters() {
     renderKpis(rows);
     renderPie(rows);
     renderTable(rows);
-
     $("lblQtd").textContent = `${rows.length} registro(s)`;
 }
 
 function renderKpis(rows) {
-    const kpis = $("kpis");
-    const total = rows.length;
-
-    const counts = {
-        VTC: 0,
-        CTC: 0,
-        LICENCA_PREMIUM: 0,
-        CONTAGEM_TEMPO: 0,
-    };
-
+    const counts = { VTC: 0, CTC: 0, LICENCA_PREMIUM: 0, CONTAGEM_TEMPO: 0 };
     rows.forEach(r => {
         const k = (r.tema_key || "").toUpperCase();
         if (k === "LICENCA_PREMIO") counts.LICENCA_PREMIUM++;
         else if (counts[k] !== undefined) counts[k]++;
     });
 
-    kpis.innerHTML = [
-        kpiCard("Total", total),
+    $("kpis").innerHTML = [
+        kpiCard("Total", rows.length),
         kpiCard("VTC", counts.VTC),
         kpiCard("CTC", counts.CTC),
         kpiCard("Licença Prêmio", counts.LICENCA_PREMIUM),
@@ -175,25 +164,20 @@ function renderKpis(rows) {
 }
 
 function kpiCard(label, value) {
-    return `
-    <div class="kpi">
-      <div class="label">${escapeHtml(label)}</div>
-      <div class="value">${value}</div>
-    </div>
-  `;
+    return `<div class="kpi"><div class="label">${escapeHtml(label)}</div><div class="value">${value}</div></div>`;
 }
 
 function renderPie(rows) {
-    const counts = { concluido: 0, andamento: 0, naoconcluido: 0, semstatus: 0 };
+    const counts = { concluido: 0, andamento: 0, naoconcluido: 0, analise: 0, devolvido: 0, publicado: 0, semstatus: 0 };
 
     rows.forEach(r => {
         const temaKey = (r.tema_key || "").toUpperCase();
         if (TEMAS_TOPICO.has(temaKey)) {
             counts.semstatus += 1;
-            return;
+        } else {
+            const c = statusClass(r.status || "");
+            if (c && counts[c] !== undefined) counts[c] += 1;
         }
-        const c = statusClass(r.status || "");
-        if (c && counts[c] !== undefined) counts[c] += 1;
     });
 
     const ctx = $("pieStatus").getContext("2d");
@@ -202,46 +186,34 @@ function renderPie(rows) {
     pieChart = new Chart(ctx, {
         type: "doughnut",
         data: {
-            labels: ["Concluído", "Em andamento", "Não concluído", "Sem status (tópico)"],
+            labels: ["Concluído", "Em andamento", "Não concluído", "Análise", "Devolvido", "Publicado", "Tópico"],
             datasets: [{
-                data: [counts.concluido, counts.andamento, counts.naoconcluido, counts.semstatus],
-                backgroundColor: ["#16A34A", "#F59E0B", "#EF4444", "#94A3B8"],
-                borderColor: "rgba(255,255,255,.10)",
+                data: [counts.concluido, counts.andamento, counts.naoconcluido, counts.analise, counts.devolvido, counts.publicado, counts.semstatus],
+                backgroundColor: ["#16A34A", "#F59E0B", "#EF4444", "#94A3B8", "#FCD34D", "#3B82F6", "#64748B"],
                 borderWidth: 1
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: true }
-            },
-            cutout: "62%"
-        }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: "62%" }
     });
 }
 
 function renderTable(rows) {
     const tbody = $("tbody");
-    tbody.innerHTML = "";
-
-    if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="muted">Nenhum registro encontrado.</td></tr>`;
-        return;
-    }
+    tbody.innerHTML = rows.length ? "" : `<tr><td colspan="8" class="muted">Nenhum registro encontrado.</td></tr>`;
 
     rows.forEach(r => {
         const temaKey = (r.tema_key || "").toUpperCase();
         const temaLabel = normalizeTemaLabel(r.tema, temaKey);
         let stCell = `<span class="muted">—</span>`;
+
         if (TEMAS_TOPICO.has(temaKey)) {
             stCell = r.topico ? `<span class="tag-neutral">${escapeHtml(prettyTopico(r.topico))}</span>` : `<span class="muted">—</span>`;
         } else {
             stCell = r.status ? `<span class="badge-status ${statusClass(r.status)}">${escapeHtml(r.status)}</span>` : `<span class="muted">—</span>`;
         }
 
-        const obs = r.observacoes ? r.observacoes : "";
+        // Regra para ocultar Data de Saída na Contagem de Tempo
+        const saidaDisplay = (temaKey === "CONTAGEM_TEMPO") ? `<span class="muted">—</span>` : (r.data_saida ? fmtDate(r.data_saida) : `<span class="muted">—</span>`);
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -251,8 +223,8 @@ function renderTable(rows) {
       <td>${stCell}</td>
       <td>${r.protocolo ? escapeHtml(r.protocolo) : `<span class="muted">—</span>`}</td>
       <td>${r.data_entrada ? fmtDate(r.data_entrada) : `<span class="muted">—</span>`}</td>
-      <td>${r.data_saida ? fmtDate(r.data_saida) : `<span class="muted">—</span>`}</td>
-      <td title="${escapeAttr(obs)}">${obs ? escapeHtml(truncate(obs, 70)) : `<span class="muted">—</span>`}</td>
+      <td>${saidaDisplay}</td>
+      <td title="${escapeAttr(r.observacoes)}">${r.observacoes ? escapeHtml(truncate(r.observacoes, 70)) : `<span class="muted">—</span>`}</td>
     `;
         tbody.appendChild(tr);
     });
@@ -280,40 +252,15 @@ function statusClass(status) {
     const s = (status || "").toLowerCase().trim();
     if (s.includes("não") || s.includes("nao")) return "naoconcluido";
     if (s.includes("andamento") || s.includes("atendendo")) return "andamento";
-    if (s.includes("concluido")) return "concluido";
+    if (s.includes("concluido") || s.includes("finalizado")) return "concluido";
+    if (s.includes("analise")) return "analise";
+    if (s.includes("devolvido")) return "devolvido";
+    if (s.includes("publicado")) return "publicado";
     return "";
 }
 
-function truncate(text, n) {
-    const s = (text || "").toString();
-    return s.length > n ? (s.slice(0, n) + "…") : s;
-}
-
-function fmtDate(dateStr) {
-    if (!dateStr) return "";
-    const [y, m, d] = dateStr.split("-");
-    return `${d}/${m}/${y}`;
-}
-
-function fmtDateTime(iso) {
-    if (!iso) return "—";
-    const dt = new Date(iso);
-    const dd = String(dt.getDate()).padStart(2, "0");
-    const mm = String(dt.getMonth() + 1).padStart(2, "0");
-    const yy = dt.getFullYear();
-    const hh = String(dt.getHours()).padStart(2, "0");
-    const mi = String(dt.getMinutes()).padStart(2, "0");
-    return `${dd}/${mm}/${yy} ${hh}:${mi}`;
-}
-
-function escapeHtml(str) {
-    return (str || "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-function escapeAttr(str) {
-    return escapeHtml(str).replaceAll('"', "&quot;");
-}
+function truncate(text, n) { return text.length > n ? text.slice(0, n) + "…" : text; }
+function fmtDate(dateStr) { if (!dateStr) return ""; const [y, m, d] = dateStr.split("-"); return `${d}/${m}/${y}`; }
+function fmtDateTime(iso) { if (!iso) return "—"; const dt = new Date(iso); return dt.toLocaleString('pt-BR'); }
+function escapeHtml(str) { return (str || "").toString().replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": "&#039;" }[m])); }
+function escapeAttr(str) { return escapeHtml(str); }
